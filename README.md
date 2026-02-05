@@ -42,7 +42,9 @@ A blazing fast multi-repository scanner for developers who juggle multiple proje
 
 ## Installation
 
-### Quick Install (Recommended)
+### Quick Install
+
+#### Linux / macOS
 
 **Using the install script:**
 ```bash
@@ -72,8 +74,31 @@ INSTALL_DIR=/usr/local/bin ./install.sh
 make install INSTALL_DIR=/usr/local/bin
 ```
 
+#### Windows
+
+**Using PowerShell:**
+```powershell
+git clone https://github.com/yourusername/git-nexus.git
+cd git-nexus
+.\install.bat
+# or directly:
+powershell -ExecutionPolicy Bypass -File install.ps1
+```
+
+This will:
+1. Build the project in release mode
+2. Install `git-nexus.exe` to `%USERPROFILE%\.local\bin`
+3. Provide instructions to add to PATH if needed
+
+**Custom Install Location:**
+```powershell
+$env:INSTALL_DIR = "C:\Program Files\git-nexus"
+.\install.ps1
+```
+
 ### From Source (Manual)
 
+**Linux / macOS:**
 ```bash
 git clone https://github.com/yourusername/git-nexus.git
 cd git-nexus
@@ -81,23 +106,44 @@ cargo build --release
 sudo cp target/release/git-nexus /usr/local/bin/
 ```
 
-### Uninstall
-
-**Using the uninstall script:**
-```bash
-./uninstall.sh
+**Windows:**
+```powershell
+git clone https://github.com/yourusername/git-nexus.git
+cd git-nexus
+cargo build --release
+# Copy target\release\git-nexus.exe to a directory in your PATH
 ```
 
-**Using Make:**
+### Uninstall
+
+**Linux / macOS:**
+```bash
+./uninstall.sh
+# or
+make uninstall
+```
+
+**Windows:**
+```powershell
+.\uninstall.bat
+# or
+powershell -ExecutionPolicy Bypass -File uninstall.ps1
+```
+
+**Using Make (Linux / macOS):**
 ```bash
 make uninstall
 ```
 
 **Manual:**
 ```bash
+# Linux / macOS
 rm ~/.local/bin/git-nexus
 # or
 sudo rm /usr/local/bin/git-nexus
+
+# Windows (PowerShell)
+Remove-Item "$env:USERPROFILE\.local\bin\git-nexus.exe"
 ```
 
 ### Verify Installation

@@ -11,11 +11,44 @@ Thank you for your interest in contributing to git-nexus! We welcome contributio
    cd git-nexus
    ```
 3. **Build the project**:
+   
+   **Linux / macOS:**
    ```bash
    make build
    # or
    cargo build
    ```
+   
+   **Windows:**
+   ```powershell
+   cargo build
+   ```
+
+## Platform-Specific Notes
+
+### Windows Development
+
+- **Makefile**: Windows doesn't have `make` by default. You can:
+  - Use `cargo` commands directly
+  - Install `make` via [chocolatey](https://chocolatey.org/): `choco install make`
+  - Use Windows Subsystem for Linux (WSL)
+
+- **PowerShell Scripts**: When testing install scripts on Windows:
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File install.ps1
+  ```
+
+- **Git Hooks**: Windows doesn't have executable permissions like Unix. The hooks detection module uses `#[cfg(unix)]` to conditionally check permissions.
+
+- **Path Separators**: The code uses Rust's `std::path::PathBuf` which handles path separators cross-platform automatically.
+
+### Cross-Platform Testing
+
+When adding features, consider:
+- Use `PathBuf` and `Path` for file paths (not string concatenation)
+- Use `#[cfg(unix)]` and `#[cfg(windows)]` for platform-specific code
+- Test on both Unix and Windows if possible
+- Avoid hardcoded path separators (`/` or `\`)
 
 ## Development Workflow
 
@@ -29,20 +62,43 @@ Thank you for your interest in contributing to git-nexus! We welcome contributio
    ```
 
 2. **Make your changes** and test them:
+   
+   **Linux / macOS:**
    ```bash
    make dev          # Quick test run
    make test         # Run test suite
    make check        # Check for errors
    ```
+   
+   **Windows:**
+   ```powershell
+   cargo run -- .    # Quick test run
+   cargo test        # Run test suite
+   cargo check       # Check for errors
+   ```
 
 3. **Format your code**:
+   
+   **Linux / macOS:**
    ```bash
    make fmt
    ```
+   
+   **Windows:**
+   ```powershell
+   cargo fmt
+   ```
 
 4. **Run lints**:
+   
+   **Linux / macOS:**
    ```bash
    make clippy
+   ```
+   
+   **Windows:**
+   ```powershell
+   cargo clippy
    ```
 
 5. **Commit your changes**:
