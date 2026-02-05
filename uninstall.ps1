@@ -7,15 +7,15 @@ $BINARY_NAME = "git-nexus.exe"
 $INSTALL_DIR = if ($env:INSTALL_DIR) { $env:INSTALL_DIR } else { "$env:USERPROFILE\.local\bin" }
 $BINARY_PATH = Join-Path $INSTALL_DIR $BINARY_NAME
 
-Write-Host "🗑️  Uninstalling git-nexus..." -ForegroundColor Cyan
+Write-Host "Uninstalling git-nexus..." -ForegroundColor Cyan
 Write-Host ""
 
 if (Test-Path $BINARY_PATH) {
-    Write-Host "📍 Found: $BINARY_PATH" -ForegroundColor Green
+    Write-Host "Found: $BINARY_PATH" -ForegroundColor Green
     Remove-Item $BINARY_PATH -Force
-    Write-Host "✅ Successfully removed $BINARY_NAME" -ForegroundColor Green
+    Write-Host "Successfully removed $BINARY_NAME" -ForegroundColor Green
 } else {
-    Write-Host "⚠️  Binary not found at: $BINARY_PATH" -ForegroundColor Yellow
+    Write-Host "WARNING: Binary not found at: $BINARY_PATH" -ForegroundColor Yellow
     
     # Check other common locations
     $otherLocations = @(
@@ -27,16 +27,16 @@ if (Test-Path $BINARY_PATH) {
     $found = $false
     foreach ($location in $otherLocations) {
         if (Test-Path $location) {
-            Write-Host "📍 Found at: $location" -ForegroundColor Green
+            Write-Host "Found at: $location" -ForegroundColor Green
             
             try {
                 Remove-Item $location -Force
-                Write-Host "✅ Successfully removed $BINARY_NAME" -ForegroundColor Green
+                Write-Host "Successfully removed $BINARY_NAME" -ForegroundColor Green
                 $found = $true
                 break
             } catch {
-                Write-Host "❌ No write permission. Try running as Administrator:" -ForegroundColor Red
-                Write-Host "   Remove-Item '$location' -Force" -ForegroundColor White
+                Write-Host "ERROR: No write permission. Try running as Administrator:" -ForegroundColor Red
+                Write-Host "  Remove-Item '$location' -Force" -ForegroundColor White
                 $found = $true
                 break
             }
@@ -44,11 +44,11 @@ if (Test-Path $BINARY_PATH) {
     }
     
     if (-not $found) {
-        Write-Host "❌ Could not find $BINARY_NAME in common locations" -ForegroundColor Red
+        Write-Host "ERROR: Could not find $BINARY_NAME in common locations" -ForegroundColor Red
         exit 1
     }
 }
 
 Write-Host ""
-Write-Host "👋 git-nexus has been uninstalled" -ForegroundColor Green
+Write-Host "git-nexus has been uninstalled" -ForegroundColor Green
 Write-Host ""

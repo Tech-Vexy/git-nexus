@@ -1,0 +1,13 @@
+# Windows scripts should use CRLF line endings
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+
+# Shell scripts should use LF
+*.sh text eol=lf
+
+# Rust source files
+*.rs text eol=lf
+*.toml text eol=lf
+
+# Markdown and documentation
+*.md text eol=lf
