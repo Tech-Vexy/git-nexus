@@ -1,8 +1,9 @@
-.PHONY: build install uninstall test clean run help
+.PHONY: build install uninstall test clean run help windows-build
 
 # Default install directory
 INSTALL_DIR ?= $(HOME)/.local/bin
 BINARY_NAME = git-nexus
+WINDOWS_TARGET = x86_64-pc-windows-gnu
 
 help: ## Show this help message
 	@echo "git-nexus - A blazing fast multi-repository scanner"
@@ -56,6 +57,21 @@ fmt: ## Format the code
 
 clippy: ## Run clippy lints
 	@cargo clippy -- -D warnings
+
+windows-build: ## Cross-compile for Windows (requires mingw-w64)
+	@echo "🪟 Building for Windows (x86_64-pc-windows-gnu)..."
+	@echo "📋 Note: Requires 'rustup target add x86_64-pc-windows-gnu' and mingw-w64"
+	@cargo build --release --target $(WINDOWS_TARGET)
+	@echo "✅ Windows build complete: target/$(WINDOWS_TARGET)/release/$(BINARY_NAME).exe"
+
+windows-setup: ## Install Windows cross-compilation toolchain
+	@echo "📦 Installing Windows target and dependencies..."
+	@rustup target add $(WINDOWS_TARGET)
+	@echo "⚠️  You may need to install mingw-w64:"
+	@echo "   Ubuntu/Debian: sudo apt install mingw-w64"
+	@echo "   Fedora/RHEL:   sudo dnf install mingw64-gcc"
+	@echo "   Arch:          sudo pacman -S mingw-w64-gcc"
+	@echo "   macOS:         brew install mingw-w64"
 
 all: clean build test ## Clean, build, and test
 
