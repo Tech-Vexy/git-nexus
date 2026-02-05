@@ -34,17 +34,100 @@ A blazing fast multi-repository scanner for developers who juggle multiple proje
 
 ## Installation
 
-### From Source
+### Quick Install (Recommended)
+
+**Using the install script:**
+```bash
+git clone https://github.com/yourusername/git-nexus.git
+cd git-nexus
+./install.sh
+```
+
+**Using Make:**
+```bash
+git clone https://github.com/yourusername/git-nexus.git
+cd git-nexus
+make install
+```
+
+This will:
+1. Build the project in release mode
+2. Install the binary to `~/.local/bin/git-nexus`
+3. Make it executable
+
+**Custom Install Location:**
+```bash
+# Using install script
+INSTALL_DIR=/usr/local/bin ./install.sh
+
+# Using Make
+make install INSTALL_DIR=/usr/local/bin
+```
+
+### From Source (Manual)
+
 ```bash
 git clone https://github.com/yourusername/git-nexus.git
 cd git-nexus
 cargo build --release
-# Binary will be at ./target/release/git-nexus
+sudo cp target/release/git-nexus /usr/local/bin/
 ```
 
-Copy to your PATH:
+### Uninstall
+
+**Using the uninstall script:**
 ```bash
-sudo cp target/release/git-nexus /usr/local/bin/
+./uninstall.sh
+```
+
+**Using Make:**
+```bash
+make uninstall
+```
+
+**Manual:**
+```bash
+rm ~/.local/bin/git-nexus
+# or
+sudo rm /usr/local/bin/git-nexus
+```
+
+### Verify Installation
+
+```bash
+git-nexus --help
+```
+
+## Development
+
+### Build
+```bash
+make build
+# or
+cargo build --release
+```
+
+### Run
+```bash
+make run          # Run in current directory
+make run-verbose  # Run with verbose output
+make run-json     # Run with JSON output
+```
+
+### Testing
+```bash
+make test
+# or
+cargo test
+```
+
+### Other Commands
+```bash
+make help    # Show all available commands
+make check   # Check for errors
+make fmt     # Format code
+make clippy  # Run lints
+make clean   # Clean build artifacts
 ```
 
 ## Usage
