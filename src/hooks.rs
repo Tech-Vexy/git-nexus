@@ -70,11 +70,11 @@ fn hook_exists(hooks_dir: &Path, hook_name: &str) -> bool {
     }
     
     // Check if it's executable (not just a .sample file)
-    if let Ok(metadata) = fs::metadata(&hook_path) {
+    if let Ok(_metadata) = fs::metadata(&hook_path) {
         #[cfg(unix)]
         {
             use std::os::unix::fs::PermissionsExt;
-            let permissions = metadata.permissions();
+            let permissions = _metadata.permissions();
             return permissions.mode() & 0o111 != 0;
         }
         

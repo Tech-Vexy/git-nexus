@@ -1,7 +1,6 @@
 use anyhow::Result;
 use chrono::Local;
 use csv::Writer;
-use std::fs::File;
 use std::path::PathBuf;
 
 use crate::RepoStatus;

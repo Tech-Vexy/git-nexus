@@ -3,6 +3,9 @@ use git2::Repository;
 use serde::Deserialize;
 use std::path::Path;
 
+// GitHub API integration is scaffolded but not fully implemented
+// This module will be completed in a future version
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct GitHubIssue {
     number: u32,
@@ -10,6 +13,7 @@ struct GitHubIssue {
     state: String,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, Deserialize)]
 struct GitHubPR {
     number: u32,
@@ -17,11 +21,13 @@ struct GitHubPR {
     state: String,
 }
 
+#[allow(dead_code)]
 pub struct GitHubInfo {
     pub open_issues: usize,
     pub open_prs: usize,
 }
 
+#[allow(dead_code)]
 pub fn get_github_info(repo_path: &Path, token: Option<&str>) -> Result<Option<GitHubInfo>> {
     let repo = Repository::open(repo_path)?;
     
@@ -38,6 +44,7 @@ pub fn get_github_info(repo_path: &Path, token: Option<&str>) -> Result<Option<G
     Ok(None)
 }
 
+#[allow(dead_code)]
 fn parse_github_url(url: &str) -> Option<(String, String)> {
     // Handle https://github.com/owner/repo.git
     if let Some(rest) = url.strip_prefix("https://github.com/") {
@@ -58,6 +65,7 @@ fn parse_github_url(url: &str) -> Option<(String, String)> {
     None
 }
 
+#[allow(dead_code)]
 fn fetch_github_data(owner: &str, repo: &str, token: Option<&str>) -> Result<Option<GitHubInfo>> {
     let client = reqwest::blocking::Client::new();
     let base_url = "https://api.github.com";
@@ -118,6 +126,7 @@ fn fetch_github_data(owner: &str, repo: &str, token: Option<&str>) -> Result<Opt
     }))
 }
 
+#[allow(dead_code)]
 fn parse_link_header(link: &str) -> usize {
     // Parse GitHub link header to get total count
     // Example: <url?page=2>; rel="next", <url?page=10>; rel="last"
