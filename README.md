@@ -28,6 +28,14 @@ A blazing fast multi-repository scanner for developers who juggle multiple proje
 - **Sort Options**: Sort by path, status, or branch name
 - **JSON Output**: Machine-readable output for scripting and automation
 
+### 🎨 Interactive & Advanced Modes
+- **TUI Mode**: Beautiful terminal UI with keyboard navigation
+- **Watch Mode**: Real-time monitoring with automatic rescanning
+- **Configuration Files**: Customize behavior with `.git-nexus.toml`
+- **Export**: Generate HTML reports or CSV files
+- **Git Hooks Detection**: See which repos have active hooks
+- **GitHub Integration**: Display issues/PRs (coming soon)
+
 ### 🛠️ Developer Experience
 - **Zero-Config Defaults**: Works out of the box in your current directory (`.`), or specify a custom root path
 - **Single Binary**: No Python environments or Node dependencies to manage—just one binary
@@ -211,21 +219,114 @@ Example JSON output:
 ]
 ```
 
+## Advanced Features
+
+### 🎨 Interactive TUI Mode
+Navigate your repositories with a beautiful terminal user interface.
+
+```bash
+git-nexus tui
+```
+
+**Controls:**
+- `↑/k` - Move up
+- `↓/j` - Move down  
+- `Home/End` - Jump to first/last
+- `q/Esc` - Quit
+
+### 👁️ Watch Mode
+Continuously monitor your workspace for git changes in real-time.
+
+```bash
+git-nexus watch
+```
+
+Watch mode will automatically rescan when it detects changes in any `.git` directory. Press `Ctrl+C` to exit.
+
+### 📊 Export to HTML/CSV
+Generate beautiful reports of your repository status.
+
+**HTML Export:**
+```bash
+git-nexus export html -o report.html
+```
+
+Creates a styled HTML page with:
+- Repository statistics dashboard
+- Color-coded status indicators
+- Last commit information
+- Fully responsive design
+
+**CSV Export:**
+```bash
+git-nexus export csv -o report.csv
+```
+
+Perfect for importing into spreadsheets or data analysis tools.
+
+### ⚙️ Configuration File
+Customize git-nexus behavior with a `.git-nexus.toml` file.
+
+**Generate example config:**
+```bash
+git-nexus config
+```
+
+**Example configuration:**
+```toml
+scan_depth = 3
+ignore_dirs = ["node_modules", "target", "venv", ".build"]
+
+[display]
+show_branch = true
+show_colors = true
+default_verbose = false
+
+[github]
+token = "your_github_token_here"
+check_issues = true
+check_prs = true
+```
+
+**Config file locations** (checked in order):
+1. `./.git-nexus.toml` (current directory)
+2. `~/.config/git-nexus/config.toml`
+3. `~/.git-nexus.toml`
+
+### 🪝 Git Hooks Detection
+See which repositories have active git hooks.
+
+```bash
+git-nexus --show-hooks -v
+```
+
+Detects hooks like: `pre-commit`, `pre-push`, `post-commit`, `post-merge`, `commit-msg`, `prepare-commit-msg`
+
 ## Options
 
 ```
-Usage: git-nexus [OPTIONS] [PATH]
+Usage: git-nexus [OPTIONS] [PATH] [COMMAND]
+
+Commands:
+  tui     Interactive TUI mode
+  watch   Watch mode - continuously monitor for changes
+  export  Export to HTML or CSV
+  config  Generate example configuration file
+  help    Print this message or the help of the given subcommand(s)
 
 Arguments:
   [PATH]  Root directory to scan for repositories [default: .]
 
 Options:
-  -d, --depth <DEPTH>    Maximum directory traversal depth [default: 3]
+  -d, --depth <DEPTH>    Maximum directory traversal depth
   -j, --json             Output in JSON format
-  -v, --verbose          Show verbose information (last commit, stash count, file counts)
+  -v, --verbose          Show verbose information
   -f, --filter <FILTER>  Filter repositories by status [possible values: clean, dirty, ahead, behind]
   -s, --sort <SORT>      Sort repositories by field [default: path] [possible values: path, status, branch]
+      --show-hooks       Show git hooks information
+      --show-github      Show GitHub info (requires token in config)
   -h, --help             Print help
+  -V, --version          Print version
 ```
 
 ## Symbol Legend
@@ -284,3 +385,9 @@ Built with:
 - [rayon](https://github.com/rayon-rs/rayon) - Parallel processing
 - [serde](https://github.com/serde-rs/serde) - JSON serialization
 - [chrono](https://github.com/chronotope/chrono) - Date/time handling
+- [ratatui](https://github.com/ratatui-org/ratatui) - Terminal UI framework
+- [crossterm](https://github.com/crossterm-rs/crossterm) - Cross-platform terminal manipulation
+- [notify](https://github.com/notify-rs/notify) - File system watching
+- [csv](https://github.com/BurntSushi/rust-csv) - CSV reading and writing
+- [toml](https://github.com/toml-rs/toml) - Configuration file parsing
+- [reqwest](https://github.com/seanmonstar/reqwest) - HTTP client for GitHub API
