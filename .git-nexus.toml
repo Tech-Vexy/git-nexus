@@ -1,0 +1,17 @@
+scan_depth = 3
+ignore_dirs = [
+    "node_modules",
+    "target",
+    "venv",
+    ".build",
+    "build",
+    "dist",
+    ".next",
+]
+
+[display]
+show_branch = true
+show_colors = true
+default_verbose = false
+
+[export]
