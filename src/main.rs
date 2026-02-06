@@ -40,6 +40,9 @@ mod config;
 mod export;
 mod github;
 mod hooks;
+mod interactive;
+mod resolution;
+mod suggestions;
 mod tui;
 mod watch;
 
@@ -84,6 +87,9 @@ struct Cli {
 
     #[arg(long, help = "Show GitHub info (requires token in config)")]
     show_github: bool,
+    
+    #[arg(long, help = "Show suggestions for fixing issues")]
+    suggest: bool,
 }
 
 #[derive(Subcommand)]
@@ -93,6 +99,16 @@ enum Commands {
     
     /// Watch mode - continuously monitor for changes
     Watch,
+    
+    /// Interactive fix mode - resolve repository issues interactively
+    Fix {
+        /// Specific repository path to fix (optional, if not provided shows all)
+        path: Option<PathBuf>,
+        
+        /// Run in dry-run mode (show what would be done without doing it)
+        #[arg(long)]
+        dry_run: bool,
+    },
     
     /// Export to HTML or CSV
     Export {
@@ -191,6 +207,29 @@ fn main() -> Result<()> {
         Some(Commands::Watch) => {
             return watch::watch_mode(&cli.path, &config, cli.verbose);
         }
+        Some(Commands::Fix { path, dry_run }) => {
+            let scan_path = path.as_ref().unwrap_or(&cli.path);
+            let repos = scan_repositories(
+                scan_path,
+                cli.depth.unwrap_or(config.scan_depth),
+                true, // verbose for fix mode
+                &config.ignore_dirs,
+                false,
+            );
+            
+            if let Some(specific_path) = path {
+                // Fix specific repository
+                if let Some(repo) = repos.iter().find(|r| r.path == specific_path) {
+                    return interactive::fix_repository_interactive(repo, dry_run);
+                } else {
+                    println!("{}", "Repository not found.".red());
+                    return Ok(());
+                }
+            } else {
+                // Interactive mode to select repositories
+                return interactive::interactive_fix_mode(&repos);
+            }
+        }
         Some(Commands::Export { format, output }) => {
             let repos = scan_repositories(
                 &cli.path,
@@ -259,8 +298,38 @@ fn main() -> Result<()> {
         println!("{}", json);
     } else {
         println!("{} {} repositories found\n", "✓".green().bold(), repos.len());
-        for repo in repos {
-            display_repo_status(&repo, cli.verbose, cli.show_hooks);
+        
+        // Show summary if suggesting
+        if cli.suggest {
+            let summary = suggestions::summarize_issues(&repos);
+            summary.display();
+            println!();
+        }
+        
+        for repo in &repos {
+            display_repo_status(repo, cli.verbose, cli.show_hooks);
+            
+            // Show suggestions if requested
+            if cli.suggest {
+                let repo_suggestions = suggestions::generate_suggestions(repo);
+                if !repo_suggestions.is_empty() {
+                    println!();
+                    for suggestion in repo_suggestions.iter().take(2) {
+                        suggestion.display();
+                    }
+                    println!();
+                }
+            }
+        }
+        
+        // Show actionable footer if there are issues
+        if cli.suggest {
+            let has_issues = repos.iter().any(|r| !r.is_clean || r.ahead > 0 || r.behind > 0);
+            if has_issues {
+                println!("\n{}", "═".repeat(60).bright_black());
+                println!("{}", "  💡 TIP: Run 'git-nexus fix' to interactively resolve issues".bright_cyan());
+                println!("{}", "═".repeat(60).bright_black());
+            }
         }
     }
 
