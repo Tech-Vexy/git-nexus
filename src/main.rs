@@ -37,18 +37,22 @@
 //! ```
 
 mod config;
+mod errors;
 mod export;
 mod github;
+mod health;
 mod hooks;
 mod interactive;
 mod resolution;
+mod stats;
 mod suggestions;
 mod tui;
 mod watch;
 
 use anyhow::Result;
 use chrono::{DateTime, Local};
-use clap::{Parser, Subcommand, ValueEnum};
+use clap::{Parser, Subcommand, ValueEnum, CommandFactory};
+use clap_complete::generate;
 use colored::*;
 use config::Config;
 use git2::{Repository, StatusOptions};
@@ -90,6 +94,12 @@ struct Cli {
     
     #[arg(long, help = "Show suggestions for fixing issues")]
     suggest: bool,
+    
+    #[arg(long, help = "Show repository health scores")]
+    health: bool,
+    
+    #[arg(long, help = "Show statistics dashboard (LOC, commits, age, etc.)")]
+    stats: bool,
 }
 
 #[derive(Subcommand)]
@@ -124,6 +134,21 @@ enum Commands {
         #[arg(short, long, default_value = ".git-nexus.toml")]
         output: PathBuf,
     },
+    
+    /// Generate shell completions
+    Completions {
+        /// The shell to generate completions for
+        #[arg(value_enum)]
+        shell: Shell,
+    },
+}
+
+#[derive(Debug, Clone, ValueEnum)]
+enum Shell {
+    Bash,
+    Zsh,
+    Fish,
+    PowerShell,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -252,6 +277,11 @@ fn main() -> Result<()> {
             println!("✅ Created example config at {}", output.display());
             return Ok(());
         }
+        Some(Commands::Completions { shell }) => {
+            let mut cmd = Cli::command();
+            print_completions(shell, &mut cmd);
+            return Ok(());
+        }
         None => {}
     }
 
@@ -261,6 +291,7 @@ fn main() -> Result<()> {
         println!();
     }
 
+    let scan_start = std::time::Instant::now();
     let mut repos = scan_repositories(
         &cli.path,
         cli.depth.unwrap_or(config.scan_depth),
@@ -268,6 +299,7 @@ fn main() -> Result<()> {
         &config.ignore_dirs,
         cli.show_hooks,
     );
+    let scan_duration = scan_start.elapsed();
 
     // Apply filter
     if let Some(ref filter) = cli.filter {
@@ -297,17 +329,51 @@ fn main() -> Result<()> {
         let json = serde_json::to_string_pretty(&repos)?;
         println!("{}", json);
     } else {
-        println!("{} {} repositories found\n", "✓".green().bold(), repos.len());
+        // Performance metrics
+        let repos_per_sec = if scan_duration.as_secs_f64() > 0.0 {
+            repos.len() as f64 / scan_duration.as_secs_f64()
+        } else {
+            0.0
+        };
         
-        // Show summary if suggesting
-        if cli.suggest {
+        println!(
+            "{} {} repositories found in {:.2}s ({:.1} repos/sec)\n",
+            "✓".green().bold(),
+            repos.len(),
+            scan_duration.as_secs_f64(),
+            repos_per_sec
+        );
+        
+        // Show summary if suggesting or health check
+        if cli.suggest || cli.health {
             let summary = suggestions::summarize_issues(&repos);
             summary.display();
+            
+            // Show average health score
+            if cli.health {
+                if let Some(avg_health) = health::average_health_score(&repos) {
+                    println!("\n  {} Average Health: {} ({})",
+                        avg_health.emoji(),
+                        avg_health.color_string(),
+                        avg_health.status().bright_cyan()
+                    );
+                }
+            }
             println!();
         }
         
         for repo in &repos {
             display_repo_status(repo, cli.verbose, cli.show_hooks);
+            
+            // Show health score if requested
+            if cli.health {
+                let health_score = health::calculate_health_score(repo);
+                println!("  {} Health: {} ({})",
+                    health_score.emoji(),
+                    health_score.color_string(),
+                    health_score.status().bright_black()
+                );
+            }
             
             // Show suggestions if requested
             if cli.suggest {
@@ -330,6 +396,11 @@ fn main() -> Result<()> {
                 println!("{}", "  💡 TIP: Run 'git-nexus fix' to interactively resolve issues".bright_cyan());
                 println!("{}", "═".repeat(60).bright_black());
             }
+        }
+        
+        // Show statistics dashboard if requested
+        if cli.stats {
+            stats::display_stats_dashboard(&repos);
         }
     }
 
@@ -1008,5 +1079,15 @@ mod tests {
         assert!(json.contains("\"ahead\":2"));
         assert!(json.contains("\"behind\":1"));
         assert!(json.contains("\"branch\":\"main\""));
+    }
+}
+
+/// Generate shell completions to stdout
+fn print_completions(shell: Shell, cmd: &mut clap::Command) {
+    match shell {
+        Shell::Bash => generate(clap_complete::shells::Bash, cmd, cmd.get_name().to_string(), &mut std::io::stdout()),
+        Shell::Zsh => generate(clap_complete::shells::Zsh, cmd, cmd.get_name().to_string(), &mut std::io::stdout()),
+        Shell::Fish => generate(clap_complete::shells::Fish, cmd, cmd.get_name().to_string(), &mut std::io::stdout()),
+        Shell::PowerShell => generate(clap_complete::shells::PowerShell, cmd, cmd.get_name().to_string(), &mut std::io::stdout()),
     }
 }
