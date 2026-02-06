@@ -81,6 +81,14 @@ pub struct DisplayConfig {
     /// Use verbose mode by default
     #[serde(default)]
     pub default_verbose: bool,
+    
+    /// Color theme selection
+    #[serde(default)]
+    pub theme: Option<String>,
+    
+    /// Use emojis in output
+    #[serde(default = "default_true")]
+    pub use_emojis: bool,
 }
 
 /// Export configuration for HTML/CSV output.
@@ -130,6 +138,8 @@ impl Default for DisplayConfig {
             show_branch: true,
             show_colors: true,
             default_verbose: false,
+            theme: None,
+            use_emojis: true,
         }
     }
 }

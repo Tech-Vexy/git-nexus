@@ -42,10 +42,13 @@ mod export;
 mod github;
 mod health;
 mod hooks;
+mod ignore;
 mod interactive;
+mod parallel;
 mod resolution;
 mod stats;
 mod suggestions;
+mod themes;
 mod tui;
 mod watch;
 
@@ -141,6 +144,9 @@ enum Commands {
         #[arg(value_enum)]
         shell: Shell,
     },
+    
+    /// List available color themes
+    Themes,
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -280,6 +286,10 @@ fn main() -> Result<()> {
         Some(Commands::Completions { shell }) => {
             let mut cmd = Cli::command();
             print_completions(shell, &mut cmd);
+            return Ok(());
+        }
+        Some(Commands::Themes) => {
+            themes::list_themes();
             return Ok(());
         }
         None => {}

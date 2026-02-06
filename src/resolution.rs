@@ -82,7 +82,7 @@ impl Action {
 }
 
 /// Result of applying an action to a repository
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ActionResult {
     pub success: bool,
     pub message: String,
