@@ -36,6 +36,7 @@
 //! }
 //! ```
 
+mod cache;
 mod config;
 mod errors;
 mod export;
@@ -44,6 +45,7 @@ mod health;
 mod hooks;
 mod ignore;
 mod interactive;
+mod notifications;
 mod parallel;
 mod resolution;
 mod stats;
@@ -147,6 +149,25 @@ enum Commands {
     
     /// List available color themes
     Themes,
+    
+    /// Manage scan cache
+    Cache {
+        #[command(subcommand)]
+        action: CacheAction,
+    },
+}
+
+#[derive(Subcommand)]
+enum CacheAction {
+    /// Show cache statistics
+    Stats,
+    /// Clear all cache entries
+    Clear,
+    /// Remove stale entries older than specified age (in hours)
+    Prune {
+        #[arg(default_value = "24")]
+        max_age_hours: u64,
+    },
 }
 
 #[derive(Debug, Clone, ValueEnum)]
@@ -290,6 +311,26 @@ fn main() -> Result<()> {
         }
         Some(Commands::Themes) => {
             themes::list_themes();
+            return Ok(());
+        }
+        Some(Commands::Cache { action }) => {
+            let mut cache = cache::ScanCache::new()?;
+            match action {
+                CacheAction::Stats => {
+                    let stats = cache.stats();
+                    println!("📊 Cache Statistics");
+                    println!("  Entries: {}", stats.total_entries);
+                    println!("  Size: {}", stats.size_human_readable());
+                }
+                CacheAction::Clear => {
+                    cache.clear()?;
+                    println!("✓ Cache cleared");
+                }
+                CacheAction::Prune { max_age_hours } => {
+                    let removed = cache.prune(max_age_hours * 3600)?;
+                    println!("✓ Removed {} stale entries", removed);
+                }
+            }
             return Ok(());
         }
         None => {}
