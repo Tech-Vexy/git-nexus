@@ -306,6 +306,7 @@ impl IssueSummary {
         println!("{}", "═".repeat(60).bright_black());
     }
 
+    #[allow(dead_code)] // Public API - may be used by consumers
     pub fn has_issues(&self) -> bool {
         self.dirty_repos > 0
             || self.ahead_repos > 0

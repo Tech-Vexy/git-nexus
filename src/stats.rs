@@ -163,7 +163,7 @@ fn calculate_age_days(repo: &Repository) -> i64 {
     
     if let Some(oldest) = oldest_time {
         let now = chrono::Utc::now().timestamp();
-        ((now - oldest) / 86400) // Convert seconds to days
+        (now - oldest) / 86400 // Convert seconds to days
     } else {
         0
     }

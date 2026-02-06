@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 
 /// Available color themes
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[allow(dead_code)] // Public API - used for theme selection
 pub enum Theme {
     /// Default theme with vibrant colors
     Default,
@@ -24,6 +25,7 @@ pub enum Theme {
 
 impl Theme {
     /// Parse theme from string
+    #[allow(dead_code)] // Public API - used for theme selection from config
     pub fn from_str(s: &str) -> Option<Self> {
         match s.to_lowercase().as_str() {
             "default" => Some(Theme::Default),
@@ -45,17 +47,20 @@ impl Default for Theme {
 
 /// Theme-aware color scheme
 #[derive(Debug, Clone)]
+#[allow(dead_code)] // Public API - used for theme-based coloring
 pub struct ColorScheme {
     theme: Theme,
 }
 
 impl ColorScheme {
     /// Create a new color scheme with the given theme
+    #[allow(dead_code)] // Public API - used for theme-based coloring
     pub fn new(theme: Theme) -> Self {
         Self { theme }
     }
     
     /// Get color for success/clean status
+    #[allow(dead_code)] // Public API - used for theme-based coloring
     pub fn success(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.green(),
@@ -68,6 +73,7 @@ impl ColorScheme {
     }
     
     /// Get color for error/dirty status
+    #[allow(dead_code)]
     pub fn error(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.red(),
@@ -80,6 +86,7 @@ impl ColorScheme {
     }
     
     /// Get color for warnings
+    #[allow(dead_code)]
     pub fn warning(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.yellow(),
@@ -92,6 +99,7 @@ impl ColorScheme {
     }
     
     /// Get color for info/neutral status
+    #[allow(dead_code)]
     pub fn info(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_cyan(),
@@ -104,6 +112,7 @@ impl ColorScheme {
     }
     
     /// Get color for paths
+    #[allow(dead_code)]
     pub fn path(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_white().bold(),
@@ -116,6 +125,7 @@ impl ColorScheme {
     }
     
     /// Get color for branch names
+    #[allow(dead_code)]
     pub fn branch(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_magenta(),
@@ -128,6 +138,7 @@ impl ColorScheme {
     }
     
     /// Get color for counts/numbers
+    #[allow(dead_code)]
     pub fn count(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_yellow(),
@@ -140,6 +151,7 @@ impl ColorScheme {
     }
     
     /// Get color for dimmed/secondary text
+    #[allow(dead_code)]
     pub fn dimmed(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_black(),
@@ -152,6 +164,7 @@ impl ColorScheme {
     }
     
     /// Get color for health status - excellent
+    #[allow(dead_code)]
     pub fn health_excellent(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_green(),
@@ -164,6 +177,7 @@ impl ColorScheme {
     }
     
     /// Get color for health status - good
+    #[allow(dead_code)]
     pub fn health_good(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_blue(),
@@ -176,6 +190,7 @@ impl ColorScheme {
     }
     
     /// Get color for health status - fair
+    #[allow(dead_code)]
     pub fn health_fair(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_yellow(),
@@ -188,6 +203,7 @@ impl ColorScheme {
     }
     
     /// Get color for health status - poor
+    #[allow(dead_code)]
     pub fn health_poor(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.yellow(),
@@ -200,6 +216,7 @@ impl ColorScheme {
     }
     
     /// Get color for health status - critical
+    #[allow(dead_code)]
     pub fn health_critical(&self, text: &str) -> ColoredString {
         match self.theme {
             Theme::Default => text.bright_red(),

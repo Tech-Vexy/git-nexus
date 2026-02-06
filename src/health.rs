@@ -55,54 +55,50 @@ impl HealthScore {
 
 /// Calculate health score for a repository
 pub fn calculate_health_score(repo: &RepoStatus) -> HealthScore {
-    let mut cleanliness = 0u8;
-    let mut sync_status = 0u8;
-    let mut branch_status = 0u8;
-
     // Cleanliness score (40 points max)
-    if repo.is_clean {
-        cleanliness = 40;
+    let cleanliness = if repo.is_clean {
+        40
     } else {
         // Partial credit based on file counts
         let modified = repo.modified_count.unwrap_or(0);
         let untracked = repo.untracked_count.unwrap_or(0);
         let total_changes = modified + untracked;
         
-        cleanliness = match total_changes {
+        match total_changes {
             0 => 40,
             1..=5 => 30,
             6..=15 => 20,
             16..=30 => 10,
             _ => 5,
-        };
-    }
+        }
+    };
 
     // Sync status score (40 points max)
-    if repo.ahead == 0 && repo.behind == 0 {
-        sync_status = 40;
+    let sync_status = if repo.ahead == 0 && repo.behind == 0 {
+        40
     } else {
         let total_divergence = repo.ahead + repo.behind;
-        sync_status = match total_divergence {
+        match total_divergence {
             0 => 40,
             1..=3 => 30,
             4..=10 => 20,
             11..=20 => 10,
             _ => 5,
-        };
-    }
+        }
+    };
 
     // Branch status score (20 points max)
-    if let Some(ref branch) = repo.branch {
+    let branch_status = if let Some(ref branch) = repo.branch {
         if branch.starts_with("detached@") {
-            branch_status = 5; // Critical: detached HEAD
+            5 // Critical: detached HEAD
         } else if branch.contains("(no commits)") {
-            branch_status = 10; // New branch
+            10 // New branch
         } else {
-            branch_status = 20; // Normal branch
+            20 // Normal branch
         }
     } else {
-        branch_status = 5; // No branch info
-    }
+        5 // No branch info
+    };
 
     let total = cleanliness + sync_status + branch_status;
 

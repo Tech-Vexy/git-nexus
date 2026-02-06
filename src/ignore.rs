@@ -3,11 +3,12 @@
 //! Reads and respects .gitignore patterns when scanning repositories.
 
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use walkdir::DirEntry;
 
 /// Ignore pattern matcher
 #[derive(Debug, Clone)]
+#[allow(dead_code)] // Public API - may be used in future features
 pub struct IgnorePatterns {
     patterns: Vec<String>,
 }
@@ -21,6 +22,7 @@ impl IgnorePatterns {
     }
     
     /// Load patterns from a .gitignore file
+    #[allow(dead_code)] // Public API - may be used in future features
     pub fn load_from_file(path: &Path) -> Self {
         let mut patterns = Vec::new();
         
@@ -39,6 +41,7 @@ impl IgnorePatterns {
     }
     
     /// Load patterns from repository's .gitignore
+    #[allow(dead_code)] // Public API - may be used in future features
     pub fn from_repo(repo_path: &Path) -> Self {
         let gitignore_path = repo_path.join(".gitignore");
         if gitignore_path.exists() {
@@ -49,6 +52,7 @@ impl IgnorePatterns {
     }
     
     /// Add a pattern to the matcher
+    #[allow(dead_code)] // Public API - may be used in future features
     pub fn add_pattern(&mut self, pattern: String) {
         self.patterns.push(pattern);
     }
@@ -164,6 +168,7 @@ impl Default for IgnorePatterns {
 }
 
 /// Get default ignore patterns for common build/dependency directories
+#[allow(dead_code)] // Public API - may be used in future features
 pub fn default_ignore_patterns() -> Vec<String> {
     vec![
         "node_modules".to_string(),
@@ -187,6 +192,7 @@ pub fn default_ignore_patterns() -> Vec<String> {
 }
 
 /// Helper function to check if a directory entry should be ignored
+#[allow(dead_code)] // Public API - may be used in future features
 pub fn should_ignore_entry(entry: &DirEntry, ignore_patterns: &IgnorePatterns) -> bool {
     let path = entry.path();
     let is_dir = entry.file_type().is_dir();

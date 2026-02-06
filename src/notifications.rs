@@ -7,6 +7,7 @@ use notify_rust::{Notification, Timeout};
 
 /// Send a notification about repository changes
 #[cfg(feature = "notifications")]
+#[allow(dead_code)] // Public API - may be used in watch mode
 pub fn notify_repo_change(repo_path: &str, change_type: &str) {
     let _ = Notification::new()
         .summary("git-nexus")
@@ -17,6 +18,7 @@ pub fn notify_repo_change(repo_path: &str, change_type: &str) {
 
 /// Send a notification about multiple repository changes
 #[cfg(feature = "notifications")]
+#[allow(dead_code)] // Public API - may be used in watch mode
 pub fn notify_multiple_changes(count: usize) {
     let _ = Notification::new()
         .summary("git-nexus")
@@ -27,6 +29,7 @@ pub fn notify_multiple_changes(count: usize) {
 
 /// Send a notification about issues detected
 #[cfg(feature = "notifications")]
+#[allow(dead_code)] // Public API - may be used in watch mode
 pub fn notify_issues(repo_path: &str, issue_count: usize) {
     let _ = Notification::new()
         .summary("git-nexus - Issues Detected")
@@ -37,6 +40,7 @@ pub fn notify_issues(repo_path: &str, issue_count: usize) {
 
 /// Send a success notification
 #[cfg(feature = "notifications")]
+#[allow(dead_code)] // Public API - may be used in interactive mode
 pub fn notify_success(message: &str) {
     let _ = Notification::new()
         .summary("git-nexus - Success")
@@ -47,6 +51,7 @@ pub fn notify_success(message: &str) {
 
 /// Send an error notification
 #[cfg(feature = "notifications")]
+#[allow(dead_code)] // Public API - may be used in error handling
 pub fn notify_error(message: &str) {
     let _ = Notification::new()
         .summary("git-nexus - Error")

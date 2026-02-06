@@ -76,11 +76,13 @@ impl ScanCache {
     }
     
     /// Get cached entry for a repository
+    #[allow(dead_code)] // Public API - used for cache retrieval
     pub fn get(&self, repo_path: &Path) -> Option<&CacheEntry> {
         self.entries.get(repo_path)
     }
     
     /// Store an entry in the cache
+    #[allow(dead_code)] // Public API - used for cache storage
     pub fn store(&mut self, repo_path: PathBuf, data: Vec<u8>, state_hash: String) -> Result<()> {
         let entry = CacheEntry {
             timestamp: SystemTime::now(),
@@ -96,6 +98,7 @@ impl ScanCache {
     }
     
     /// Check if a cache entry is still valid
+    #[allow(dead_code)] // Public API - used for cache validation
     pub fn is_valid(&self, repo_path: &Path, max_age_secs: u64) -> bool {
         if let Some(entry) = self.get(repo_path) {
             if let Ok(elapsed) = entry.timestamp.elapsed() {
@@ -111,6 +114,7 @@ impl ScanCache {
     }
     
     /// Compute a hash of the repository state for invalidation
+    #[allow(dead_code)] // Private helper for cache validation
     fn compute_state_hash(repo_path: &Path) -> Result<String> {
         // Simple hash based on HEAD ref and index modification time
         let git_dir = repo_path.join(".git");
@@ -134,6 +138,7 @@ impl ScanCache {
     }
     
     /// Invalidate a specific cache entry
+    #[allow(dead_code)] // Public API - used for cache invalidation
     pub fn invalidate(&mut self, repo_path: &Path) -> Result<()> {
         self.entries.remove(repo_path);
         self.save_cache()?;

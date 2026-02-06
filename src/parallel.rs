@@ -4,19 +4,20 @@
 
 use crate::resolution::{Action, ActionResult, apply_action};
 use crate::RepoStatus;
-use anyhow::Result;
 use indicatif::{MultiProgress, ProgressBar, ProgressStyle};
 use rayon::prelude::*;
 use std::sync::{Arc, Mutex};
 
 /// Result of a batch operation
 #[derive(Debug, Clone)]
+#[allow(dead_code)] // Public API - used in parallel operations
 pub struct BatchResult {
     pub repo_path: String,
     pub action_result: ActionResult,
 }
 
 /// Execute an action on multiple repositories in parallel
+#[allow(dead_code)] // Public API - may be used in interactive fix mode
 pub fn execute_parallel(
     repos: &[RepoStatus],
     action: Action,
@@ -86,6 +87,7 @@ pub fn execute_parallel(
 }
 
 /// Execute different actions on multiple repositories in parallel
+#[allow(dead_code)] // Public API - may be used in interactive fix mode
 pub fn execute_parallel_actions(
     operations: Vec<(RepoStatus, Action)>,
     dry_run: bool,
@@ -154,6 +156,7 @@ pub fn execute_parallel_actions(
 }
 
 /// Display summary of batch operation results
+#[allow(dead_code)] // Public API - may be used in interactive fix mode
 pub fn display_batch_summary(results: &[BatchResult]) {
     let successful = results.iter().filter(|r| r.action_result.success).count();
     let failed = results.len() - successful;
