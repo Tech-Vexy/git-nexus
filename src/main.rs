@@ -130,7 +130,7 @@ enum Commands {
         #[arg(value_enum)]
         format: ExportFormat,
         
-        #[arg(short, long)]
+        #[arg(short, long, help = "Output file path (extension auto-added if missing)")]
         output: PathBuf,
     },
     
@@ -291,12 +291,15 @@ fn main() -> Result<()> {
                 cli.show_hooks,
             );
             
+            // Automatically add correct extension if not present
+            let output_path = ensure_correct_extension(&output, &format);
+            
             match format {
-                ExportFormat::Html => export::export_html(&repos, &output)?,
-                ExportFormat::Csv => export::export_csv(&repos, &output)?,
+                ExportFormat::Html => export::export_html(&repos, &output_path)?,
+                ExportFormat::Csv => export::export_csv(&repos, &output_path)?,
             }
             
-            println!("✅ Exported to {}", output.display());
+            println!("✅ Exported to {}", output_path.display());
             return Ok(());
         }
         Some(Commands::Config { output }) => {
@@ -1141,4 +1144,24 @@ fn print_completions(shell: Shell, cmd: &mut clap::Command) {
         Shell::Fish => generate(clap_complete::shells::Fish, cmd, cmd.get_name().to_string(), &mut std::io::stdout()),
         Shell::PowerShell => generate(clap_complete::shells::PowerShell, cmd, cmd.get_name().to_string(), &mut std::io::stdout()),
     }
+}
+
+/// Ensure the output path has the correct file extension for the format
+fn ensure_correct_extension(path: &PathBuf, format: &ExportFormat) -> PathBuf {
+    let expected_ext = match format {
+        ExportFormat::Html => "html",
+        ExportFormat::Csv => "csv",
+    };
+    
+    // Check if path already has the correct extension
+    if let Some(ext) = path.extension() {
+        if ext == expected_ext {
+            return path.clone();
+        }
+    }
+    
+    // Add or replace extension
+    let mut new_path = path.clone();
+    new_path.set_extension(expected_ext);
+    new_path
 }
